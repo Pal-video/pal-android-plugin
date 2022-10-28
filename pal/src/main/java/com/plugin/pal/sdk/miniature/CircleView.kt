@@ -12,9 +12,14 @@ import android.view.SurfaceView
 class CircleView: SurfaceView {
 
     private var borderWidth = 0
+
     private var canvasSize = 0
+
     private var paintBorder: Paint? = null
+
     private var path: Path? = null
+
+    var rounded: Boolean = true
 
     constructor(context: Context): super(context) {
         init()
@@ -58,9 +63,6 @@ class CircleView: SurfaceView {
         canvasSize = canvas.width
         if (canvas.height < canvasSize) canvasSize = canvas.height
 
-        // circleCenter is the x or y of the view's center
-        // radius is the radius in pixels of the cirle to be drawn
-        // paint contains the shader that will texture the shape
         val circleCenter = (canvasSize - borderWidth * 2) / 2
         val radius = circleCenter
 
@@ -68,30 +70,30 @@ class CircleView: SurfaceView {
         Log.d("CircleVideoView", String.format("canvas.width : %s", canvas.width))
         Log.d("CircleVideoView", String.format("circleCenter : %s", circleCenter))
         Log.d("CircleVideoView", String.format("radius : %s", radius))
-
-//        canvas.drawCircle(
-//            (circleCenter + borderWidth).toFloat(),
-//            (circleCenter + borderWidth).toFloat(),
-//            radius - borderWidth - 4.0f,
-//            paintBorder!!
-//        )
-//        path!!.addCircle(
-//            (circleCenter + borderWidth).toFloat(),
-//            (circleCenter + borderWidth).toFloat(),
-//            radius - 4.0f,
-//            Path.Direction.CW
-//        )
-//        canvas.clipPath(path!!)
+        if(rounded) {
+            canvas.drawCircle(
+                (circleCenter + borderWidth).toFloat(),
+                (circleCenter + borderWidth).toFloat(),
+                radius - borderWidth - 4.0f,
+                paintBorder!!
+            )
+            path!!.addCircle(
+                (circleCenter + borderWidth).toFloat(),
+                (circleCenter + borderWidth).toFloat(),
+                radius - 4.0f,
+                Path.Direction.CW
+            )
+            canvas.clipPath(path!!)
+        }
         super.dispatchDraw(canvas)
-
     }
 
-//    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-//        val width: Int = measureWidth(widthMeasureSpec)
-//        val height: Int = measureHeight(heightMeasureSpec)
-//
-//        setMeasuredDimension(width, height)
-//    }
+    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+        val width: Int = measureWidth(widthMeasureSpec)
+        val height: Int = measureHeight(heightMeasureSpec)
+
+        setMeasuredDimension(width, height)
+    }
 
     private fun measureWidth(measureSpec: Int): Int {
         var result = 0
@@ -133,19 +135,5 @@ class CircleView: SurfaceView {
         }
         return result
     }
-
-
-//    <com.plugin.pal.sdk.miniature.CircleView
-//    android:id="@+id/expanded_videoView"
-//    android:layout_width="500dp"
-//    android:layout_height="500dp"
-//    android:visibility="invisible"
-//    android:layout_gravity="bottom"
-//    app:layout_constraintBottom_toBottomOf="parent"
-//    app:layout_constraintEnd_toEndOf="parent"
-//    app:layout_constraintHorizontal_bias="0.0"
-//    app:layout_constraintStart_toStartOf="parent"
-//    app:layout_constraintTop_toTopOf="parent"
-//    app:layout_constraintVertical_bias="0.998" />
 
 }

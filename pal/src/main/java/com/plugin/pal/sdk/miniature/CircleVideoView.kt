@@ -15,13 +15,12 @@ import android.media.MediaPlayer
 import android.net.Uri
 import android.util.AttributeSet
 import android.util.Log
-import android.util.Size
 import android.view.SurfaceHolder
 import android.view.View
 import android.view.View.OnClickListener
-import android.view.View.VISIBLE
 import android.view.WindowManager
 import android.view.animation.DecelerateInterpolator
+import android.widget.FrameLayout
 import android.widget.LinearLayout
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.plugin.pal.R
@@ -42,7 +41,7 @@ class CircleVideoView :ConstraintLayout, SurfaceHolder.Callback {
 
     var player: MediaPlayer? = null
 
-    var videoRatio: Int? = null
+    var videoRatio: Float? = null
 
     var circleView: CircleView? = null
 
@@ -72,7 +71,8 @@ class CircleVideoView :ConstraintLayout, SurfaceHolder.Callback {
         shortAnimationDuration = 1000
         currentAnimator?.cancel()
 
-        // FIXME change for a non round view
+        circleView!!.rounded = false
+        circleView!!.invalidate()
 
         val startBoundsInt = Rect()
         val finalBoundsInt = Rect()
@@ -80,8 +80,6 @@ class CircleVideoView :ConstraintLayout, SurfaceHolder.Callback {
 
         circleView!!.getGlobalVisibleRect(startBoundsInt)
         findViewById<View>(R.id.video_container).getGlobalVisibleRect(finalBoundsInt, globalOffset)
-        Log.d("CircleVideoView", String.format("globalOffset.x : %s", globalOffset.x))
-        Log.d("CircleVideoView", String.format("globalOffset.y : %s", globalOffset.y))
         startBoundsInt.offset(-globalOffset.x, -globalOffset.y)
         finalBoundsInt.offset(-globalOffset.x, -globalOffset.y)
 
@@ -126,7 +124,6 @@ class CircleVideoView :ConstraintLayout, SurfaceHolder.Callback {
     private fun init(attrs: AttributeSet? = null) {
         inflate(context, R.layout.video_min, this)
         circleView = findViewById(R.id.min_videoView)
-//        expandedVideo = findViewById(R.id.expanded_videoView)
 
         val holder: SurfaceHolder = circleView!!.holder
         holder.setFormat(PixelFormat.TRANSLUCENT)
@@ -170,34 +167,51 @@ class CircleVideoView :ConstraintLayout, SurfaceHolder.Callback {
         circleView!!.setOnClickListener(onViewTouched)
     }
 
-    var mOnVideoSizeChangedListener =
+    private var mOnVideoSizeChangedListener =
         MediaPlayer.OnVideoSizeChangedListener { mp, width, height ->
             setFitToFillAspectRatio(mp, width, height)
         }
+
 
     private fun setFitToFillAspectRatio(mp: MediaPlayer, videoWidth: Int, videoHeight: Int) {
         var screenWidth: Int = circleView!!.width
         var screenHeight: Int = circleView!!.height
 
-        videoRatio = videoWidth / videoHeight
-        layoutParams.width = screenWidth
-        layoutParams.height = screenHeight
+        if(videoRatio == null) {
+            val size = getVideoSizeFromMetadata()
+            Log.d("CircleVideoView", "metadata size: ${size.first} / ${size.second}")
+            videoRatio = size.first.toFloat() / size.second
+        }
+        var params = circleView!!.layoutParams as FrameLayout.LayoutParams
+        params.width = screenWidth
+        params.height = screenHeight
+        Log.d("CircleVideoView", "videoRatio: $videoRatio")
         if (videoWidth > videoHeight) {
             Log.d("CircleVideoView", "videoWidth > videoHeight")
-            Log.d("CircleVideoView", String.format("screenWidth : %s", screenWidth))
-            Log.d("CircleVideoView", String.format("screenHeight : %s", screenHeight))
-            layoutParams.width = screenWidth
-            layoutParams.height = screenHeight
-//            layoutParams.height = screenWidth * videoHeight / videoWidth
+            params.width = screenWidth
+            params.height = (screenWidth * (1 / videoRatio!!)).toInt()
         } else {
             Log.d("CircleVideoView", "videoWidth <= videoHeight")
-            layoutParams.width = screenHeight * videoWidth / videoHeight
-            layoutParams.height = screenHeight
+            params.width = (screenHeight * videoRatio!!).toInt()
+            params.height = screenHeight
         }
+        circleView!!.layoutParams = params
+    }
+
+    private fun getVideoSizeFromMetadata(): Pair<Int, Int> {
+        val retriever = MediaMetadataRetriever()
+        retriever.setDataSource(videoUrl)
+        val width =
+            Integer.valueOf(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH)!!)
+        val height =
+            Integer.valueOf(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT)!!)
+        retriever.release()
+        return Pair(width, height)
     }
 
     override fun surfaceCreated(holder: SurfaceHolder) {
         player!!.setDisplay(holder);
+        player!!.seekTo(52000)
         player!!.start()
     }
 
