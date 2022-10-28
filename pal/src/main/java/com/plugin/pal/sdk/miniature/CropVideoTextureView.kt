@@ -111,13 +111,6 @@ class CropVideoTextureView : TextureView, SurfaceTextureListener {
         val matrix = Matrix()
         matrix.setScale(scaleX, scaleY, pivotPointX.toFloat(), pivotPointY.toFloat())
         setTransform(matrix)
-        val canvas = Canvas()
-        canvas.drawCircle(
-            (12 + borderWidth).toFloat(),
-            (12 + borderWidth).toFloat(),
-            50 - borderWidth - 4.0f,
-            paintBorder!!
-        )
     }
 
     private fun initPlayer() {
@@ -252,6 +245,7 @@ class CropVideoTextureView : TextureView, SurfaceTextureListener {
             return
         }
         mState = State.PLAY
+        mMediaPlayer!!.seekTo(54000)
         mMediaPlayer!!.start()
     }
 

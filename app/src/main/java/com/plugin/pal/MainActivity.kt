@@ -23,12 +23,12 @@ class MainActivity : AppCompatActivity() {
             //Toast.makeText(this@MainActivity, "Starting Pal video", Toast.LENGTH_SHORT).show()
         }
 
-        Handler(mainLooper).post {
-            val cropVideo = findViewById<CropVideoTextureView>(R.id.texture_test)
-            cropVideo.setScaleType(CropVideoTextureView.ScaleType.CENTER_CROP);
-            cropVideo.setDataSource(videoUrl);
-            cropVideo.play()
-        }
+//        Handler(mainLooper).post {
+//            val cropVideo = findViewById<CropVideoTextureView>(R.id.texture_test)
+//            cropVideo.setScaleType(CropVideoTextureView.ScaleType.CENTER_CROP);
+//            cropVideo.setDataSource(videoUrl);
+//            cropVideo.play()
+//        }
 
     }
 

@@ -16,7 +16,18 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.998" />
+        app:layout_constraintVertical_bias="0.998" >
+
+        <com.plugin.pal.sdk.miniature.CropVideoTextureView
+            android:id="@+id/crop_video_texture"
+            android:layout_width="300dp"
+            android:layout_height="300dp"
+            android:layout_marginBottom="32dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+    </com.plugin.pal.sdk.miniature.CircleView>
 
 
 

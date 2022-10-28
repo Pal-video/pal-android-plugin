@@ -4,6 +4,7 @@ import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
+import android.animation.ValueAnimator
 import android.app.Activity
 import android.content.Context
 import android.graphics.PixelFormat
@@ -26,24 +27,26 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import com.plugin.pal.R
 
 
-class CircleVideoView :ConstraintLayout, SurfaceHolder.Callback {
+class CircleVideoView :ConstraintLayout{
 
-    constructor(context: Context): super(context) {
+    constructor(context: Context) : super(context) {
     }
 
-    constructor(context: Context, attrs: AttributeSet): super(context, attrs) {
+    constructor(context: Context, attrs: AttributeSet) : super(context, attrs) {
     }
 
     constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0)
             : super(context, attrs, defStyleAttr) {
-        init()
+//        init()
     }
 
-    var player: MediaPlayer? = null
+//    var player: MediaPlayer? = null
 
-    var videoRatio: Float? = null
+//    var videoRatio: Float? = null
 
     var circleView: CircleView? = null
+
+    var cropedVideoView: CropVideoTextureView? = null
 
     var videoUrl: String? = null
 
@@ -71,6 +74,7 @@ class CircleVideoView :ConstraintLayout, SurfaceHolder.Callback {
         shortAnimationDuration = 1000
         currentAnimator?.cancel()
 
+//        circleView!!.mRadius = 50f
         circleView!!.rounded = false
         circleView!!.invalidate()
 
@@ -90,7 +94,8 @@ class CircleVideoView :ConstraintLayout, SurfaceHolder.Callback {
         circleView!!.pivotY = circleView!!.measuredHeight.toFloat()
 
         val scaleX = (finalBounds.width() - 80) / circleView!!.width
-        val scaleY = scaleX * videoRatio!!
+//        val scaleY = scaleX * videoRatio!!
+        val scaleY = (finalBounds.height() - 120) / circleView!!.height
 
         currentAnimator = AnimatorSet().apply {
             play(
@@ -103,6 +108,7 @@ class CircleVideoView :ConstraintLayout, SurfaceHolder.Callback {
             ).apply {
                 with(ObjectAnimator.ofFloat(circleView, View.SCALE_X, 1f, scaleX))
                 with(ObjectAnimator.ofFloat(circleView, View.SCALE_Y, 1f, scaleY))
+                with(ValueAnimator.ofFloat(circleView!!.mRadius, 100f, 16f))
             }
             duration = shortAnimationDuration.toLong()
             interpolator = DecelerateInterpolator()
@@ -121,105 +127,120 @@ class CircleVideoView :ConstraintLayout, SurfaceHolder.Callback {
 
     }
 
-    private fun init(attrs: AttributeSet? = null) {
-        inflate(context, R.layout.video_min, this)
-        circleView = findViewById(R.id.min_videoView)
-
-        val holder: SurfaceHolder = circleView!!.holder
-        holder.setFormat(PixelFormat.TRANSLUCENT)
-        holder.addCallback(this)
-
-        val ta = context.obtainStyledAttributes(attrs, R.styleable.CircleVideoView)
-        try {
-            videoUrl = ta.getString(R.styleable.CircleVideoView_videoUrl)
-            if(videoUrl != null ) {
-                player = MediaPlayer.create(
-                    this.context,
-                    Uri.parse(videoUrl)
-                )
-                player!!.isLooping = true
-                player!!.setOnVideoSizeChangedListener(mOnVideoSizeChangedListener);
-            }
-        } finally {
-            ta.recycle()
-        }
-    }
+//    private fun init(attrs: AttributeSet? = null) {
+//        inflate(context, R.layout.video_min, this)
+//        circleView = findViewById(R.id.min_videoView)
+//
+//        val holder: SurfaceHolder = circleView!!.holder
+//        holder.setFormat(PixelFormat.TRANSLUCENT)
+//        holder.addCallback(this)
+//
+//        val ta = context.obtainStyledAttributes(attrs, R.styleable.CircleVideoView)
+//        try {
+//            videoUrl = ta.getString(R.styleable.CircleVideoView_videoUrl)
+//            if (videoUrl != null) {
+//                player = MediaPlayer.create(
+//                    this.context,
+//                    Uri.parse(videoUrl)
+//                )
+//                player!!.isLooping = true
+//                player!!.setOnVideoSizeChangedListener(mOnVideoSizeChangedListener);
+//            }
+//        } finally {
+//            ta.recycle()
+//        }
+//    }
 
     private fun load(videoUrl: String) {
         this.videoUrl = videoUrl
         inflate(context, R.layout.video_min, this)
         circleView = findViewById(R.id.min_videoView)
+        cropedVideoView = findViewById(R.id.crop_video_texture)
+        cropedVideoView!!.setDataSource(videoUrl)
+        cropedVideoView!!.setScaleType(CropVideoTextureView.ScaleType.CENTER_CROP);
 
-        val holder: SurfaceHolder = circleView!!.holder
-        holder.setFormat(PixelFormat.TRANSLUCENT)
-        holder.addCallback(this)
-
-        player = MediaPlayer.create(
-            this.context,
-            Uri.parse(videoUrl)
-        )
-        player!!.isLooping = true
-        player!!.setOnVideoSizeChangedListener(mOnVideoSizeChangedListener);
         val onViewTouched = OnClickListener {
 //            (parent as ViewGroup).removeView(this)
             expand()
         }
         circleView!!.setOnClickListener(onViewTouched)
+        cropedVideoView!!.play()
     }
+//    private fun load(videoUrl: String) {
+//        this.videoUrl = videoUrl
+//        inflate(context, R.layout.video_min, this)
+//        circleView = findViewById(R.id.min_videoView)
+//
+//        val holder: SurfaceHolder = circleView!!.holder
+//        holder.setFormat(PixelFormat.TRANSLUCENT)
+//        holder.addCallback(this)
+//
+//        player = MediaPlayer.create(
+//            this.context,
+//            Uri.parse(videoUrl)
+//        )
+//        player!!.isLooping = true
+//        player!!.setOnVideoSizeChangedListener(mOnVideoSizeChangedListener);
+//        val onViewTouched = OnClickListener {
+////            (parent as ViewGroup).removeView(this)
+//            expand()
+//        }
+//        circleView!!.setOnClickListener(onViewTouched)
+//    }
+//
+//    private var mOnVideoSizeChangedListener =
+//        MediaPlayer.OnVideoSizeChangedListener { mp, width, height ->
+//            setFitToFillAspectRatio(mp, width, height)
+//        }
 
-    private var mOnVideoSizeChangedListener =
-        MediaPlayer.OnVideoSizeChangedListener { mp, width, height ->
-            setFitToFillAspectRatio(mp, width, height)
-        }
 
-
-    private fun setFitToFillAspectRatio(mp: MediaPlayer, videoWidth: Int, videoHeight: Int) {
-        var screenWidth: Int = circleView!!.width
-        var screenHeight: Int = circleView!!.height
-
-        if(videoRatio == null) {
-            val size = getVideoSizeFromMetadata()
-            Log.d("CircleVideoView", "metadata size: ${size.first} / ${size.second}")
-            videoRatio = size.first.toFloat() / size.second
-        }
-        var params = circleView!!.layoutParams as FrameLayout.LayoutParams
-        params.width = screenWidth
-        params.height = screenHeight
-        Log.d("CircleVideoView", "videoRatio: $videoRatio")
-        if (videoWidth > videoHeight) {
-            Log.d("CircleVideoView", "videoWidth > videoHeight")
-            params.width = screenWidth
-            params.height = (screenWidth * (1 / videoRatio!!)).toInt()
-        } else {
-            Log.d("CircleVideoView", "videoWidth <= videoHeight")
-            params.width = (screenHeight * videoRatio!!).toInt()
-            params.height = screenHeight
-        }
-        circleView!!.layoutParams = params
-    }
-
-    private fun getVideoSizeFromMetadata(): Pair<Int, Int> {
-        val retriever = MediaMetadataRetriever()
-        retriever.setDataSource(videoUrl)
-        val width =
-            Integer.valueOf(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH)!!)
-        val height =
-            Integer.valueOf(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT)!!)
-        retriever.release()
-        return Pair(width, height)
-    }
-
-    override fun surfaceCreated(holder: SurfaceHolder) {
-        player!!.setDisplay(holder);
-        player!!.seekTo(52000)
-        player!!.start()
-    }
-
-    override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {
-//        Log.d("CircleVideoView", "On surface changed")
-    }
-
-    override fun surfaceDestroyed(holder: SurfaceHolder) {
-
-    }
+//    private fun setFitToFillAspectRatio(mp: MediaPlayer, videoWidth: Int, videoHeight: Int) {
+//        var screenWidth: Int = circleView!!.width
+//        var screenHeight: Int = circleView!!.height
+//
+//        if(videoRatio == null) {
+//            val size = getVideoSizeFromMetadata()
+//            Log.d("CircleVideoView", "metadata size: ${size.first} / ${size.second}")
+//            videoRatio = size.first.toFloat() / size.second
+//        }
+//        var params = circleView!!.layoutParams as FrameLayout.LayoutParams
+//        params.width = screenWidth
+//        params.height = screenHeight
+//        Log.d("CircleVideoView", "videoRatio: $videoRatio")
+//        if (videoWidth > videoHeight) {
+//            Log.d("CircleVideoView", "videoWidth > videoHeight")
+//            params.width = screenWidth
+//            params.height = (screenWidth * (1 / videoRatio!!)).toInt()
+//        } else {
+//            Log.d("CircleVideoView", "videoWidth <= videoHeight")
+//            params.width = (screenHeight * videoRatio!!).toInt()
+//            params.height = screenHeight
+//        }
+//        circleView!!.layoutParams = params
+//    }
+//
+//    private fun getVideoSizeFromMetadata(): Pair<Int, Int> {
+//        val retriever = MediaMetadataRetriever()
+//        retriever.setDataSource(videoUrl)
+//        val width =
+//            Integer.valueOf(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH)!!)
+//        val height =
+//            Integer.valueOf(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT)!!)
+//        retriever.release()
+//        return Pair(width, height)
+//    }
+//
+//    override fun surfaceCreated(holder: SurfaceHolder) {
+//        player!!.setDisplay(holder);
+//        player!!.seekTo(52000)
+//        player!!.start()
+//    }
+//
+//    override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {
+////        Log.d("CircleVideoView", "On surface changed")
+//    }
+//
+//    override fun surfaceDestroyed(holder: SurfaceHolder) {
+//
+//    }
 }
