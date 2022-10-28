@@ -1,4 +1,4 @@
-package com.plugin.pal
+package com.plugin.pal.sdk.miniature
 
 import android.content.Context
 import android.graphics.Canvas
@@ -69,30 +69,29 @@ class CircleView: SurfaceView {
         Log.d("CircleVideoView", String.format("circleCenter : %s", circleCenter))
         Log.d("CircleVideoView", String.format("radius : %s", radius))
 
-        canvas.drawCircle(
-            (circleCenter + borderWidth).toFloat(),
-            (circleCenter + borderWidth).toFloat(),
-            radius - borderWidth - 4.0f,
-            paintBorder!!
-        )
-        path!!.addCircle(
-            (circleCenter + borderWidth).toFloat(),
-            (circleCenter + borderWidth).toFloat(),
-            radius - 4.0f,
-            Path.Direction.CW
-        )
-        canvas.clipPath(path!!)
-//        canvas.clipPath(clipPath!!);
+//        canvas.drawCircle(
+//            (circleCenter + borderWidth).toFloat(),
+//            (circleCenter + borderWidth).toFloat(),
+//            radius - borderWidth - 4.0f,
+//            paintBorder!!
+//        )
+//        path!!.addCircle(
+//            (circleCenter + borderWidth).toFloat(),
+//            (circleCenter + borderWidth).toFloat(),
+//            radius - 4.0f,
+//            Path.Direction.CW
+//        )
+//        canvas.clipPath(path!!)
         super.dispatchDraw(canvas)
 
     }
 
-    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        val width: Int = measureWidth(widthMeasureSpec)
-        val height: Int = measureHeight(heightMeasureSpec)
-
-        setMeasuredDimension(width, height)
-    }
+//    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+//        val width: Int = measureWidth(widthMeasureSpec)
+//        val height: Int = measureHeight(heightMeasureSpec)
+//
+//        setMeasuredDimension(width, height)
+//    }
 
     private fun measureWidth(measureSpec: Int): Int {
         var result = 0
@@ -100,33 +99,53 @@ class CircleView: SurfaceView {
         val specSize = MeasureSpec.getSize(measureSpec)
         result = if (specMode == MeasureSpec.EXACTLY) {
             // The parent has determined an exact size for the child.
+            Log.d("CircleView", "measureWidth: exact size")
             specSize
         } else if (specMode == MeasureSpec.AT_MOST) {
             // The child can be as large as it wants up to the specified size.
+            Log.d("CircleView", "measureWidth: child as most")
             specSize
         } else {
             // The parent has not imposed any constraint on the child.
+            Log.d("CircleView", "measureWidth: canvasSize")
             canvasSize
         }
-        return result
+        return result // + 2
     }
 
     private fun measureHeight(measureSpecHeight: Int): Int {
         var result = 0
         val specMode = MeasureSpec.getMode(measureSpecHeight)
         val specSize = MeasureSpec.getSize(measureSpecHeight)
-        result = if (specMode == MeasureSpec.EXACTLY) {
-            // We were told how big to be
-            specSize
-        } else if (specMode == MeasureSpec.AT_MOST) {
-            // The child can be as large as it wants up to the specified size.
-            specSize
-        } else {
-            // Measure the text (beware: ascent is a negative number)
-            canvasSize
+        result = when (specMode) {
+            MeasureSpec.EXACTLY -> {
+                // We were told how big to be
+                specSize
+            }
+            MeasureSpec.AT_MOST -> {
+                // The child can be as large as it wants up to the specified size.
+                specSize
+            }
+            else -> {
+                // Measure the text (beware: ascent is a negative number)
+                canvasSize
+            }
         }
-        return result + 2
+        return result
     }
 
+
+//    <com.plugin.pal.sdk.miniature.CircleView
+//    android:id="@+id/expanded_videoView"
+//    android:layout_width="500dp"
+//    android:layout_height="500dp"
+//    android:visibility="invisible"
+//    android:layout_gravity="bottom"
+//    app:layout_constraintBottom_toBottomOf="parent"
+//    app:layout_constraintEnd_toEndOf="parent"
+//    app:layout_constraintHorizontal_bias="0.0"
+//    app:layout_constraintStart_toStartOf="parent"
+//    app:layout_constraintTop_toTopOf="parent"
+//    app:layout_constraintVertical_bias="0.998" />
 
 }
