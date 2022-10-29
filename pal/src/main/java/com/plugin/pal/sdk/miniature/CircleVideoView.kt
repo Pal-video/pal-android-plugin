@@ -74,10 +74,6 @@ class CircleVideoView :ConstraintLayout{
         shortAnimationDuration = 1000
         currentAnimator?.cancel()
 
-//        circleView!!.mRadius = 50f
-        circleView!!.rounded = false
-        circleView!!.invalidate()
-
         val startBoundsInt = Rect()
         val finalBoundsInt = Rect()
         val globalOffset = Point()
@@ -93,10 +89,13 @@ class CircleVideoView :ConstraintLayout{
         circleView!!.pivotX = 0f
         circleView!!.pivotY = circleView!!.measuredHeight.toFloat()
 
-        val scaleX = (finalBounds.width() - 80) / circleView!!.width
-//        val scaleY = scaleX * videoRatio!!
-        val scaleY = (finalBounds.height() - 120) / circleView!!.height
+        val finalWidth = finalBounds.width() - 80
+        val finalHeight = finalBounds.height() - 120
+        val finalRatio = finalWidth / finalHeight
+        val scaleX = finalWidth / circleView!!.width
+        val scaleY = finalHeight / circleView!!.height
 
+        circleView!!.animateShape()
         currentAnimator = AnimatorSet().apply {
             play(
                 ObjectAnimator.ofFloat(
@@ -108,7 +107,7 @@ class CircleVideoView :ConstraintLayout{
             ).apply {
                 with(ObjectAnimator.ofFloat(circleView, View.SCALE_X, 1f, scaleX))
                 with(ObjectAnimator.ofFloat(circleView, View.SCALE_Y, 1f, scaleY))
-                with(ValueAnimator.ofFloat(circleView!!.mRadius, 100f, 16f))
+                with(ObjectAnimator.ofFloat(cropedVideoView, View.SCALE_X, 1f, 1/finalRatio))
             }
             duration = shortAnimationDuration.toLong()
             interpolator = DecelerateInterpolator()
@@ -116,6 +115,8 @@ class CircleVideoView :ConstraintLayout{
 
                 override fun onAnimationEnd(animation: Animator) {
                     currentAnimator = null
+//                    cropedVideoView!!.refresh()
+//                    cropedVideoView!!.invalidate()
                 }
 
                 override fun onAnimationCancel(animation: Animator) {

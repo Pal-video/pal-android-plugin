@@ -1,11 +1,13 @@
 package com.plugin.pal.sdk.miniature
 
+import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Path
 import android.graphics.RectF
 import android.util.AttributeSet
 import android.util.Log
+import android.view.animation.LinearInterpolator
 import android.widget.FrameLayout
 import kotlin.math.min
 
@@ -20,7 +22,7 @@ class CircleView : FrameLayout {
         mRadius = attrs.getAttributeFloatValue(null, "corner_radius", 0f)
     }
 
-    var mRadius: Float = 0f
+    var mRadius: Float = 250f
         get() = field
 
         set(value) {
@@ -28,11 +30,21 @@ class CircleView : FrameLayout {
             Log.d("CircleView", "--> $value")
         }
 
-
-    var rounded = true
     private val mPath: Path = Path()
+
     private val mRect = RectF()
 
+    fun animateShape() {
+        val animator = ValueAnimator.ofFloat(mRadius, 12f).apply {
+            duration = 500
+            interpolator = LinearInterpolator()
+            addUpdateListener { valueAnimator ->
+                mRadius = valueAnimator.animatedValue as Float
+                invalidate()
+            }
+        }
+        animator.start()
+    }
 
     override fun onDraw(canvas: Canvas) {
         val savedState: Int = canvas.save()
@@ -62,20 +74,13 @@ class CircleView : FrameLayout {
 
     private fun computePath(w: Int, h: Int) {
         mPath.reset()
-        if(rounded) {
-            val centerX = w / 2f
-            val centerY = h / 2f
-            mPath.addCircle(centerX, centerY, min(centerX, centerY), Path.Direction.CW)
-        } else {
-            Log.d("CircleView", "--> compute")
-            val centerX = w.toFloat()
-            val centerY = h.toFloat()
-            mPath.addRoundRect(
-                centerX, centerY, 0f, 0f,
-                mRadius,
-                mRadius,
-                Path.Direction.CCW)
-        }
+        val centerX = w.toFloat()
+        val centerY = h.toFloat()
+        mPath.addRoundRect(
+            centerX, centerY, 0f, 0f,
+            mRadius,
+            mRadius,
+            Path.Direction.CCW)
         mPath.close()
     }
 }

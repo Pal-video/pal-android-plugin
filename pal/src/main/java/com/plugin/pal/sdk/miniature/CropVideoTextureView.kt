@@ -168,6 +168,10 @@ class CropVideoTextureView : TextureView, SurfaceTextureListener {
         }
     }
 
+    fun refresh() {
+        updateTextureViewSize()
+    }
+
     private fun prepare() {
         try {
             mMediaPlayer!!.setOnVideoSizeChangedListener { mp, width, height ->
