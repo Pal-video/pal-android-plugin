@@ -11,10 +11,12 @@ import android.graphics.Point
 import android.graphics.Rect
 import android.graphics.RectF
 import android.util.AttributeSet
+import android.util.Log
 import android.view.View
 import android.view.View.OnClickListener
 import android.view.WindowManager
 import android.view.animation.DecelerateInterpolator
+import android.view.animation.LinearInterpolator
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -70,8 +72,6 @@ class CircleVideoView :ConstraintLayout{
     // Animation
 
     private var currentAnimator: Animator? = null
-
-    private var shortAnimationDuration: Int = 0
 
 //    private fun init(attrs: AttributeSet? = null) {
 //        inflate(context, R.layout.video_min, this)
@@ -161,23 +161,22 @@ class CircleVideoView :ConstraintLayout{
         cropedVideoView!!.play()
 
         // animate
-
-        shortAnimationDuration = 1000
         currentAnimator?.cancel()
 
         val startBoundsInt = Rect()
         val finalBoundsInt = Rect()
+        val circleViewBoundsInt = Rect()
+        val circleViewOffset = Point()
         val globalOffset = Point()
 
         circleView!!.getGlobalVisibleRect(startBoundsInt)
         findViewById<View>(R.id.video_container).getGlobalVisibleRect(finalBoundsInt, globalOffset)
-        startBoundsInt.offset(-globalOffset.x, -globalOffset.y)
+        findViewById<View>(R.id.min_videoView).getGlobalVisibleRect(circleViewBoundsInt, circleViewOffset)
+        startBoundsInt.offset(globalOffset.x, circleViewOffset.y)
         finalBoundsInt.offset(-globalOffset.x, -globalOffset.y)
 
-        val startBounds = RectF(startBoundsInt)
         val finalBounds = RectF(finalBoundsInt)
-
-        val finalWidth = finalBounds.width() - 180
+        val finalWidth = finalBounds.width() - 120
         val finalHeight = finalBounds.height() - 120
 
         circleView!!.animateShape()
@@ -185,40 +184,6 @@ class CircleVideoView :ConstraintLayout{
             circleView!!.scaledAnimated(finalWidth, finalHeight)
             state = State.expanded
         }
-
-        currentAnimator = AnimatorSet().apply {
-            play(
-                ObjectAnimator.ofFloat(
-                    circleView,
-                    View.X,
-                    startBounds.left,
-                    finalBounds.left
-                )
-            ).apply {
-                with(ObjectAnimator.ofFloat(circleView, View.TRANSLATION_X, 1f, 0f))
-            }
-            duration = shortAnimationDuration.toLong()
-            interpolator = DecelerateInterpolator()
-            addListener(object : AnimatorListenerAdapter() {
-
-                override fun onAnimationEnd(animation: Animator) {
-                    currentAnimator = null
-
-//                    descriptionLayout!!.visibility = VISIBLE
-//                    poweredByLayout!!.visibility = VISIBLE
-                }
-
-                override fun onAnimationCancel(animation: Animator) {
-                    currentAnimator = null
-                }
-            })
-            start()
-        }
-
     }
-
-
-
-
 
 }

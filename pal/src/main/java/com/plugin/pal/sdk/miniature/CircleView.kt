@@ -1,15 +1,16 @@
 package com.plugin.pal.sdk.miniature
 
-import android.animation.Animator
-import android.animation.ValueAnimator
+import android.animation.*
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Path
 import android.graphics.RectF
 import android.util.AttributeSet
+import android.view.View
 import android.view.animation.Animation
 import android.view.animation.LinearInterpolator
 import android.view.animation.ScaleAnimation
+import android.view.animation.TranslateAnimation
 import android.widget.FrameLayout
 
 
@@ -46,9 +47,10 @@ class CircleView : FrameLayout {
         animator.start()
     }
 
-    fun changeRatioAnimated(finalWidth: Float,
-                            finalHeight: Float,
-                            onAnimationEnd: () -> Unit,
+    fun changeRatioAnimated(
+        finalWidth: Float,
+        finalHeight: Float,
+        onAnimationEnd: () -> Unit,
     ) {
         val ratio = (finalWidth / finalHeight)
         val initialWidth = measuredWidth
@@ -76,22 +78,40 @@ class CircleView : FrameLayout {
     }
 
     fun scaledAnimated(finalWidth: Float, finalHeight: Float) {
+        val view = this
         val scaleX = finalWidth / width
         val scaleY = finalHeight / height
-        val anim: Animation = ScaleAnimation(
-            1f, scaleX,
-            1f, scaleY,
-            Animation.RELATIVE_TO_SELF, 0f, // Pivot point X
-            Animation.RELATIVE_TO_SELF, 1f  // Pivot point Y
-        )
-        anim.fillAfter = true // Needed to keep the result of the animation
-        anim.duration = 1000
-//        anim.setAnimationListener(object : Animation.AnimationListener {
-//            override fun onAnimationStart(animation: Animation?) {}
-//            override fun onAnimationEnd(animation: Animation?) {}
-//            override fun onAnimationRepeat(animation: Animation?) {}
-//        })
-        startAnimation(anim)
+        val startX = translationX;
+        val startY = translationY;
+
+        this.pivotX = 0f
+        this.pivotY = measuredHeight.toFloat()
+        var animator = AnimatorSet().apply {
+            playTogether(
+                ObjectAnimator.ofFloat(view, View.SCALE_X, 1f, scaleX),
+                ObjectAnimator.ofFloat(view, View.SCALE_Y, 1f, scaleY),
+                ObjectAnimator.ofFloat(view, View.TRANSLATION_X, startX, -convertDpToPixel(24f)),
+                ObjectAnimator.ofFloat(view, View.TRANSLATION_Y, startY, convertDpToPixel(24f)),
+            ).apply {
+            }
+            duration = 300L
+            interpolator = LinearInterpolator()
+            addListener(object : AnimatorListenerAdapter() {
+                override fun onAnimationEnd(animation: Animator) {
+//                    descriptionLayout!!.visibility = VISIBLE
+//                    poweredByLayout!!.visibility = VISIBLE
+
+                }
+                override fun onAnimationCancel(animation: Animator) {}
+            })
+            start()
+        }
+
+    }
+
+    fun convertDpToPixel(dp: Float): Float {
+        val density = context.resources.displayMetrics.densityDpi;
+        return (dp * (density/ 160.0f))
     }
 
     override fun onDraw(canvas: Canvas) {
