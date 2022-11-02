@@ -1,25 +1,34 @@
 package com.plugin.pal
 
-import android.graphics.PixelFormat
 import android.os.Bundle
-import android.os.Handler
-import android.view.*
+import android.util.Log
 import android.widget.*
-import com.plugin.pal.sdk.miniature.CircleVideoView
 import androidx.appcompat.app.AppCompatActivity
-import com.plugin.pal.sdk.miniature.CropVideoTextureView
+import com.plugin.pal.sdk.PalSdk
 
 class MainActivity : AppCompatActivity() {
 
-    val videoUrl = "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4"
+    val videoUrl_LQ = "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4"
+    val videoUrl_HQ = "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        val palSdk = PalSdk()
+
         val button2 = findViewById<Button>(R.id.button2)
         button2.setOnClickListener {
-            this.createPopup3()
+            palSdk.showVideo(
+                this,
+                videoUrl_LQ,
+                videoUrl_HQ,
+                "Lorem",
+                "Lorem ipsum lorem",
+                {  Log.d("MainActivity", "onSkip") },
+                {  Log.d("MainActivity", "onExpand") },
+                {  Log.d("MainActivity", "onVideoEnd") },
+            )
             //Toast.makeText(this@MainActivity, "Starting Pal video", Toast.LENGTH_SHORT).show()
         }
 
@@ -30,11 +39,6 @@ class MainActivity : AppCompatActivity() {
 //            cropVideo.play()
 //        }
 
-    }
-
-    private fun createPopup3() {
-        val minVideoView = CircleVideoView(this)
-        minVideoView.show(this, videoUrl)
     }
 
 }

@@ -114,6 +114,9 @@ class CropVideoTextureView : TextureView, SurfaceTextureListener {
     }
 
     private fun initPlayer() {
+        if(isInEditMode) {
+            return
+        }
         if (mMediaPlayer == null) {
             mMediaPlayer = MediaPlayer()
         } else {
@@ -249,7 +252,6 @@ class CropVideoTextureView : TextureView, SurfaceTextureListener {
             return
         }
         mState = State.PLAY
-        mMediaPlayer!!.seekTo(54000)
         mMediaPlayer!!.start()
     }
 
