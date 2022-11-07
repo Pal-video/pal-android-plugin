@@ -42,7 +42,7 @@ class PalSdk {
         activity: Activity,
         minVideoUrl: String,
         onSkip: () -> Unit,
-        onExpand: () -> Unit,
+        onExpand: () -> Unit
     ) {
         val minVideoView = MinVideoLayout(activity)
         minVideoView.init(minVideoUrl, onExpand)
@@ -60,6 +60,8 @@ class PalSdk {
 
         expandedVideo.show(activity)
         expandedVideo.setLayout(expandedLayout)
+        expandedVideo.onVideoEnd = onVideoEnd
+        expandedVideo.onVideoSkip = onSkip
         expandedVideo.play(expandedVideoUrl)
     }
 

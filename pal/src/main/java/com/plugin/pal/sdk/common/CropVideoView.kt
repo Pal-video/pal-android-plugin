@@ -236,6 +236,10 @@ class CropVideoView : TextureView, SurfaceTextureListener {
         this.timer!!.setSecondsListener(listener)
     }
 
+    fun setSoundLevel(level: Float) {
+        mMediaPlayer!!.setVolume(level, level)
+    }
+
     /**
      * Play or resume video. Video will be played as soon as view is available and media player is
      * prepared.

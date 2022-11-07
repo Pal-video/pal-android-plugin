@@ -55,6 +55,10 @@ class ExpandedVideoView: ConstraintLayout, CropVideoView.MediaPlayerListener  {
 
     // video attrs
 
+    var onVideoEnd : (() -> Unit)? = null
+
+    var onVideoSkip : (() -> Unit)? = null
+
     var expandedVideoUrl: String? = null
 
     fun init() {
@@ -89,6 +93,7 @@ class ExpandedVideoView: ConstraintLayout, CropVideoView.MediaPlayerListener  {
         cropedVideoView!!.setListener(this)
         cropedVideoView!!.setDataSource(expandedVideoUrl)
         cropedVideoView!!.play()
+        cropedVideoView!!.setSoundLevel(1f)
     }
 
     fun setLayout(overlay: View) {
@@ -158,6 +163,9 @@ class ExpandedVideoView: ConstraintLayout, CropVideoView.MediaPlayerListener  {
                 override fun onAnimationEnd(animation: Animator) {
                     super.onAnimationEnd(animation)
                     Handler(view.context.mainLooper).postDelayed({
+                        if(onVideoEnd != null) {
+                            onVideoEnd()
+                        }
                         (view.parent as ViewGroup).removeView(view)
                     }, 500)
                 }
