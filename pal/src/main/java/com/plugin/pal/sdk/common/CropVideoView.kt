@@ -1,20 +1,22 @@
-package com.plugin.pal.sdk.miniature
+package com.plugin.pal.sdk.common
 
 import android.content.Context
 import android.content.res.AssetFileDescriptor
 import android.graphics.*
-import android.graphics.drawable.Drawable
 import android.media.MediaPlayer
 import android.net.Uri
+import android.os.Handler
 import android.util.AttributeSet
 import android.util.Log
 import android.view.Surface
 import android.view.TextureView
 import android.view.TextureView.SurfaceTextureListener
+import com.plugin.pal.sdk.common.VideoTimer.VideoTime
 import java.io.IOException
 
 
-class CropVideoTextureView : TextureView, SurfaceTextureListener {
+class CropVideoView : TextureView, SurfaceTextureListener {
+
     private var mMediaPlayer: MediaPlayer? = null
     private var mVideoHeight = 0f
     private var mVideoWidth = 0f
@@ -24,6 +26,8 @@ class CropVideoTextureView : TextureView, SurfaceTextureListener {
     private var mIsPlayCalled = false
     private var mScaleType: ScaleType? = null
     private var mState: State? = null
+
+    private var timer: VideoTimer? = null
 
     enum class ScaleType {
         CENTER_CROP, TOP, BOTTOM
@@ -75,15 +79,25 @@ class CropVideoTextureView : TextureView, SurfaceTextureListener {
         val viewHeight = height.toFloat()
         var scaleX = 1.0f
         var scaleY = 1.0f
-        if (mVideoWidth > viewWidth && mVideoHeight > viewHeight) {
+        val videoRatio = (mVideoWidth / mVideoHeight)
+        val layoutRatio =  viewWidth / viewHeight
+        val hasDiffRatio = (layoutRatio - videoRatio) > 0.01
+
+        log("layoutRatio $layoutRatio")
+        log("videoRatio $videoRatio")
+        if (hasDiffRatio && mVideoWidth > viewWidth && mVideoHeight > viewHeight) {
+            log("1 - mVideoWidth > viewWidth && mVideoHeight > viewHeight")
             scaleX = mVideoWidth / viewWidth
             scaleY = mVideoHeight / viewHeight
-        } else if (mVideoWidth < viewWidth && mVideoHeight < viewHeight) {
-            scaleY = viewWidth / mVideoWidth
+        } else if (hasDiffRatio && mVideoWidth < viewWidth && mVideoHeight < viewHeight) {
+            log("2 - mVideoWidth < viewWidth && mVideoHeight < viewHeight")
             scaleX = viewHeight / mVideoHeight
-        } else if (viewWidth > mVideoWidth) {
+            scaleY = viewWidth / mVideoWidth
+        } else if (hasDiffRatio && viewWidth > mVideoWidth) {
+            log("viewWidth > mVideoWidth")
             scaleY = viewWidth / mVideoWidth / (viewHeight / mVideoHeight)
-        } else if (viewHeight > mVideoHeight) {
+        } else if (hasDiffRatio && viewHeight > mVideoHeight) {
+            log("viewHeight > mVideoHeigh")
             scaleX = viewHeight / mVideoHeight / (viewWidth / mVideoWidth)
         }
 
@@ -119,6 +133,7 @@ class CropVideoTextureView : TextureView, SurfaceTextureListener {
         }
         if (mMediaPlayer == null) {
             mMediaPlayer = MediaPlayer()
+            timer = VideoTimer(mMediaPlayer!!, Handler(context.mainLooper))
         } else {
             mMediaPlayer!!.reset()
         }
@@ -214,6 +229,13 @@ class CropVideoTextureView : TextureView, SurfaceTextureListener {
         }
     }
 
+    fun setTimeListener(listener : (videoTime: VideoTime) -> Unit) {
+        if(timer == null) {
+            throw java.lang.RuntimeException("You must call setDataSource before doing this")
+        }
+        this.timer!!.setSecondsListener(listener)
+    }
+
     /**
      * Play or resume video. Video will be played as soon as view is available and media player is
      * prepared.
@@ -247,12 +269,13 @@ class CropVideoTextureView : TextureView, SurfaceTextureListener {
         if (mState == State.END || mState == State.STOP) {
             log("play() was called but video already ended, starting over.")
             mState = State.PLAY
-            mMediaPlayer!!.seekTo(0)
             mMediaPlayer!!.start()
+            mMediaPlayer!!.seekTo(0)
             return
         }
         mState = State.PLAY
         mMediaPlayer!!.start()
+        timer!!.start()
     }
 
     /**
@@ -274,6 +297,7 @@ class CropVideoTextureView : TextureView, SurfaceTextureListener {
         mState = State.PAUSE
         if (mMediaPlayer!!.isPlaying) {
             mMediaPlayer!!.pause()
+            timer!!.stop()
         }
     }
 
@@ -293,6 +317,7 @@ class CropVideoTextureView : TextureView, SurfaceTextureListener {
         mState = State.STOP
         if (mMediaPlayer!!.isPlaying) {
             mMediaPlayer!!.pause()
+            timer!!.stop()
             mMediaPlayer!!.seekTo(0)
         }
     }
@@ -356,7 +381,7 @@ class CropVideoTextureView : TextureView, SurfaceTextureListener {
         const val LOG_ON = true
 
         // Log tag
-        private val TAG = CropVideoTextureView::class.java.name
+        private val TAG = CropVideoView::class.java.name
         fun log(message: String?) {
             if (LOG_ON) {
                 Log.d(TAG, message!!)

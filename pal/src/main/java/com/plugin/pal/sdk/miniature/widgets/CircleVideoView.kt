@@ -1,20 +1,20 @@
-package com.plugin.pal.sdk.miniature
+package com.plugin.pal.sdk.miniature.widgets
 
 import android.animation.*
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Path
 import android.graphics.RectF
+import android.os.Build
 import android.util.AttributeSet
 import android.view.View
-import android.view.animation.Animation
+import android.view.animation.AccelerateInterpolator
 import android.view.animation.LinearInterpolator
-import android.view.animation.ScaleAnimation
-import android.view.animation.TranslateAnimation
+import android.view.animation.OvershootInterpolator
 import android.widget.FrameLayout
 
 
-class CircleView : FrameLayout {
+class CircleVideoView : FrameLayout {
 
     constructor(context: Context): super(context) {}
 
@@ -37,7 +37,7 @@ class CircleView : FrameLayout {
 
     fun animateShape() {
         val animator = ValueAnimator.ofFloat(mRadius, 12f).apply {
-            duration = 500
+            duration = 150L
             interpolator = LinearInterpolator()
             addUpdateListener { valueAnimator ->
                 mRadius = valueAnimator.animatedValue as Float
@@ -50,13 +50,12 @@ class CircleView : FrameLayout {
     fun changeRatioAnimated(
         finalWidth: Float,
         finalHeight: Float,
-        onAnimationEnd: () -> Unit,
     ) {
         val ratio = (finalWidth / finalHeight)
         val initialWidth = measuredWidth
         val initialHeight = measuredHeight
         val animator = ValueAnimator.ofFloat(1f, ratio).apply {
-            duration = 500
+            duration = 150L
             interpolator = LinearInterpolator()
             addUpdateListener { valueAnimator ->
                 val value = valueAnimator.animatedValue as Float
@@ -66,18 +65,15 @@ class CircleView : FrameLayout {
             }
           addListener(object: Animator.AnimatorListener {
               override fun onAnimationStart(animation: Animator) {}
-              override fun onAnimationEnd(animation: Animator) {
-                  onAnimationEnd()
-              }
+              override fun onAnimationEnd(animation: Animator) {}
               override fun onAnimationCancel(animation: Animator) {}
               override fun onAnimationRepeat(animation: Animator) {}
           })
         }
-//
         animator.start()
     }
 
-    fun scaledAnimated(finalWidth: Float, finalHeight: Float) {
+    fun scaledAnimated(finalWidth: Float, finalHeight: Float, onAnimationEnd: () -> Unit) {
         val view = this
         val scaleX = finalWidth / width
         val scaleY = finalHeight / height
@@ -92,24 +88,67 @@ class CircleView : FrameLayout {
                 ObjectAnimator.ofFloat(view, View.SCALE_Y, 1f, scaleY),
                 ObjectAnimator.ofFloat(view, View.TRANSLATION_X, startX, -convertDpToPixel(24f)),
                 ObjectAnimator.ofFloat(view, View.TRANSLATION_Y, startY, convertDpToPixel(24f)),
-            ).apply {
-            }
+            )
             duration = 300L
             interpolator = LinearInterpolator()
             addListener(object : AnimatorListenerAdapter() {
                 override fun onAnimationEnd(animation: Animator) {
-//                    descriptionLayout!!.visibility = VISIBLE
-//                    poweredByLayout!!.visibility = VISIBLE
-
+                    onAnimationEnd()
                 }
                 override fun onAnimationCancel(animation: Animator) {}
             })
             start()
         }
-
     }
 
-    fun convertDpToPixel(dp: Float): Float {
+    fun enterAnimated() {
+        this.alpha = 0f
+        visibility = VISIBLE
+        val view = this
+        this.pivotX = measuredWidth.toFloat() / 2
+        this.pivotY = measuredHeight.toFloat() / 2
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            resetPivot()
+        }
+        AnimatorSet().apply {
+            playTogether(
+                ObjectAnimator.ofFloat(view, View.ALPHA, 0f, 1f),
+                ObjectAnimator.ofFloat(view, View.SCALE_X, 0f, 1f),
+                ObjectAnimator.ofFloat(view, View.SCALE_Y, 0f, 1f),
+            )
+            startDelay = 500
+            duration = 500
+            interpolator = OvershootInterpolator()
+            start()
+        }
+    }
+
+    fun exitAnimated(onAnimationEnd: () -> Unit) {
+        val view = this
+        this.pivotX = measuredWidth.toFloat() / 2
+        this.pivotY = measuredHeight.toFloat() / 2
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            resetPivot()
+        }
+        AnimatorSet().apply {
+            playTogether(
+                ObjectAnimator.ofFloat(view, View.SCALE_X,  1f, 0f),
+                ObjectAnimator.ofFloat(view, View.SCALE_Y, 1f, 0f),
+            )
+            addListener(object: AnimatorListenerAdapter() {
+                override fun onAnimationEnd(animation: Animator) {
+                    super.onAnimationEnd(animation)
+                    onAnimationEnd()
+                }
+            })
+            startDelay = 100
+            duration = 300
+            interpolator = AccelerateInterpolator()
+            start()
+        }
+    }
+
+    private fun convertDpToPixel(dp: Float): Float {
         val density = context.resources.displayMetrics.densityDpi;
         return (dp * (density/ 160.0f))
     }
@@ -125,10 +164,6 @@ class CircleView : FrameLayout {
         val debug: Boolean = canvas.clipPath(mPath)
         super.onDraw(canvas)
         canvas.restoreToCount(savedState)
-    }
-
-    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec)
     }
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {

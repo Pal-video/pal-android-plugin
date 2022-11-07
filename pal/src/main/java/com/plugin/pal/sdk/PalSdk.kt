@@ -1,11 +1,14 @@
 package com.plugin.pal.sdk
 
 import android.app.Activity
-import com.plugin.pal.sdk.miniature.CircleVideoView
+import android.view.View
+import com.plugin.pal.sdk.expanded.ExpandedVideoView
+import com.plugin.pal.sdk.expanded.TalkLayout
+import com.plugin.pal.sdk.miniature.MinVideoLayout
 
 class PalSdk {
 
-    fun showVideo(
+    fun showTalkVideo(
         activity: Activity,
         minVideoUrl: String,
         expandedVideoUrl: String,
@@ -15,12 +18,49 @@ class PalSdk {
         onExpand: () -> Unit,
         onVideoEnd: () -> Unit,
     ) {
-        val minVideoView = CircleVideoView(activity)
-        minVideoView.show(
+        val talkLayout = TalkLayout(activity)
+        talkLayout.initData(userName, companyTitle)
+
+        val onVideoExpand = {
+            onExpand()
+            showExpandedVideo(
+                activity,
+                expandedVideoUrl,
+                talkLayout,
+                onSkip,
+                onVideoEnd)
+        }
+        showMinVideo(
             activity,
-            minVideoUrl, expandedVideoUrl,
-            userName, companyTitle
+            minVideoUrl,
+            onSkip,
+            onVideoExpand
         )
+    }
+
+    fun showMinVideo(
+        activity: Activity,
+        minVideoUrl: String,
+        onSkip: () -> Unit,
+        onExpand: () -> Unit,
+    ) {
+        val minVideoView = MinVideoLayout(activity)
+        minVideoView.init(minVideoUrl, onExpand)
+        minVideoView.show(activity)
+    }
+
+    fun showExpandedVideo(
+        activity: Activity,
+        expandedVideoUrl: String,
+        expandedLayout: View,
+        onSkip: () -> Unit,
+        onVideoEnd: () -> Unit,
+    ) {
+        val expandedVideo = ExpandedVideoView(activity)
+
+        expandedVideo.show(activity)
+        expandedVideo.setLayout(expandedLayout)
+        expandedVideo.play(expandedVideoUrl)
     }
 
 }
