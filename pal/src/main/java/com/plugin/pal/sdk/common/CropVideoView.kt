@@ -3,8 +3,14 @@ package com.plugin.pal.sdk.common
 import android.content.Context
 import android.content.res.AssetFileDescriptor
 import android.graphics.*
+import android.media.AudioAttributes
+import android.media.AudioAttributes.CONTENT_TYPE_MOVIE
+import android.media.AudioAttributes.USAGE_MEDIA
 import android.media.MediaPlayer
+import android.media.MediaTimestamp
+import android.media.PlaybackParams
 import android.net.Uri
+import android.os.Build
 import android.os.Handler
 import android.util.AttributeSet
 import android.util.Log
@@ -74,7 +80,7 @@ class CropVideoView : TextureView, SurfaceTextureListener {
     private var path: Path? = null
 
     private fun updateTextureViewSize() {
-        Log.d("CircleVideoView", "updateTextureViewSize")
+        log("...updateTextureViewSize")
         val viewWidth = width.toFloat()
         val viewHeight = height.toFloat()
         var scaleX = 1.0f
@@ -199,15 +205,12 @@ class CropVideoView : TextureView, SurfaceTextureListener {
             }
             mMediaPlayer!!.setOnCompletionListener {
                 mState = State.END
+                timer!!.stop()
                 log("Video has ended.")
                 if (mListener != null) {
                     mListener!!.onVideoEnd()
                 }
             }
-
-            // don't forget to call MediaPlayer.prepareAsync() method when you use constructor for
-            // creating MediaPlayer
-            mMediaPlayer!!.prepareAsync()
 
             // Play video when the media source is ready for playback.
             mMediaPlayer!!.setOnPreparedListener {
@@ -220,6 +223,21 @@ class CropVideoView : TextureView, SurfaceTextureListener {
                     mListener!!.onVideoPrepared()
                 }
             }
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                val playbackParams = PlaybackParams()
+                playbackParams.pitch = 1.0f
+                playbackParams.speed = 1.0f
+                mMediaPlayer!!.playbackParams = playbackParams
+
+                val audioAttrs = AudioAttributes.Builder()
+                    .setUsage(USAGE_MEDIA)
+                    .setContentType(CONTENT_TYPE_MOVIE)
+                    .build()
+                mMediaPlayer!!.setAudioAttributes(audioAttrs)
+            }
+
+            mMediaPlayer!!.prepareAsync()
         } catch (e: IllegalArgumentException) {
             Log.d(TAG, e.message!!)
         } catch (e: SecurityException) {
@@ -267,14 +285,20 @@ class CropVideoView : TextureView, SurfaceTextureListener {
         if (mState == State.PAUSE) {
             log("play() was called but video is paused, resuming.")
             mState = State.PLAY
+            timer!!.start()
             mMediaPlayer!!.start()
             return
         }
         if (mState == State.END || mState == State.STOP) {
             log("play() was called but video already ended, starting over.")
             mState = State.PLAY
+            when {
+                Build.VERSION.SDK_INT >= Build.VERSION_CODES.O ->
+                    mMediaPlayer!!.seekTo(0, MediaPlayer.SEEK_CLOSEST_SYNC)
+                else -> mMediaPlayer!!.seekTo(0)
+            }
+            timer!!.start()
             mMediaPlayer!!.start()
-            mMediaPlayer!!.seekTo(0)
             return
         }
         mState = State.PLAY

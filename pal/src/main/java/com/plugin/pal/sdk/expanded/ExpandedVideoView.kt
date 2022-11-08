@@ -65,7 +65,6 @@ class ExpandedVideoView: ConstraintLayout, CropVideoView.MediaPlayerListener  {
         cropedVideoView = findViewById(R.id.crop_video_texture)
         videoContainer = findViewById(R.id.video_container)
         videoContainer!!.alpha = 0f
-        videoContainer!!.visibility = VISIBLE
 
         this.state = ExpandedState.STARTING
     }
@@ -88,10 +87,11 @@ class ExpandedVideoView: ConstraintLayout, CropVideoView.MediaPlayerListener  {
     fun play(videoUrl: String) {
         expandedVideoUrl = videoUrl
         cropedVideoView!!.setLooping(false)
-        cropedVideoView!!.setScaleType(CropVideoView.ScaleType.CENTER_CROP);
         cropedVideoView!!.setListener(this)
+        cropedVideoView!!.setScaleType(CropVideoView.ScaleType.CENTER_CROP);
         cropedVideoView!!.setDataSource(expandedVideoUrl)
         cropedVideoView!!.setSoundLevel(1f)
+        cropedVideoView!!.pause()
     }
 
     fun setLayout(overlay: View) {
@@ -140,6 +140,7 @@ class ExpandedVideoView: ConstraintLayout, CropVideoView.MediaPlayerListener  {
             interpolator = AccelerateInterpolator()
             start()
         }
+
     }
 
     private fun exitAnimated() {
