@@ -15,14 +15,13 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.view.animation.AccelerateInterpolator
-import android.view.animation.LinearInterpolator
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.plugin.pal.R
 import com.plugin.pal.sdk.common.CropVideoView
-import kotlinx.coroutines.delay
 
+typealias OnVideoEnd = () -> Unit
 
 class ExpandedVideoView: ConstraintLayout, CropVideoView.MediaPlayerListener  {
 
@@ -57,7 +56,7 @@ class ExpandedVideoView: ConstraintLayout, CropVideoView.MediaPlayerListener  {
 
     // video attrs
 
-    var onVideoEnd : (() -> Unit)? = null
+    var onVideoEnd : (OnVideoEnd)? = null
 
     var expandedVideoUrl: String? = null
 
@@ -92,7 +91,6 @@ class ExpandedVideoView: ConstraintLayout, CropVideoView.MediaPlayerListener  {
         cropedVideoView!!.setScaleType(CropVideoView.ScaleType.CENTER_CROP);
         cropedVideoView!!.setListener(this)
         cropedVideoView!!.setDataSource(expandedVideoUrl)
-        cropedVideoView!!.play()
         cropedVideoView!!.setSoundLevel(1f)
     }
 
@@ -169,7 +167,6 @@ class ExpandedVideoView: ConstraintLayout, CropVideoView.MediaPlayerListener  {
                         if(onVideoEnd != null) {
                             onVideoEnd()
                         }
-                        cropedVideoView!!.stop()
                         cropedVideoView!!.close()
                         (view.parent as ViewGroup).removeView(view)
                     }, 500)
@@ -181,10 +178,13 @@ class ExpandedVideoView: ConstraintLayout, CropVideoView.MediaPlayerListener  {
         }
     }
 
-    override fun onVideoPrepared() {}
+    override fun onVideoPrepared() {
+        cropedVideoView!!.play()
+    }
 
     override fun onVideoEnd() {
         Log.d("ExpandedVideoView", "on video end")
+        cropedVideoView!!.stop()
         exitAnimated()
     }
 

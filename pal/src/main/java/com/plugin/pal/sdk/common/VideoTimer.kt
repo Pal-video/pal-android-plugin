@@ -49,7 +49,7 @@ class VideoTimer(
         running = true
         val task = object: Runnable {
             override fun run() {
-                if(running) {
+                if(running && mediaPlayer.isPlaying) {
                     val result = VideoTime(
                         mediaPlayer.currentPosition,
                         mediaPlayer.duration)
