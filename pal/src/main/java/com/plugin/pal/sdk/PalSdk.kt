@@ -19,7 +19,8 @@ class PalSdk {
         onVideoEnd: () -> Unit,
     ) {
         val talkLayout = TalkLayout(activity)
-        talkLayout.initData(userName, companyTitle)
+        talkLayout.setDescription(userName, companyTitle)
+        talkLayout.setOnCloseTapListener(onSkip)
 
         val onVideoExpand = {
             onExpand()
@@ -27,7 +28,6 @@ class PalSdk {
                 activity,
                 expandedVideoUrl,
                 talkLayout,
-                onSkip,
                 onVideoEnd)
         }
         showMinVideo(
@@ -38,7 +38,11 @@ class PalSdk {
         )
     }
 
-    fun showMinVideo(
+    // ------------------------------------------------
+    // PRIVATES
+    // ------------------------------------------------
+
+    private fun showMinVideo(
         activity: Activity,
         minVideoUrl: String,
         onSkip: () -> Unit,
@@ -49,11 +53,10 @@ class PalSdk {
         minVideoView.show(activity)
     }
 
-    fun showExpandedVideo(
+    private fun showExpandedVideo(
         activity: Activity,
         expandedVideoUrl: String,
         expandedLayout: View,
-        onSkip: () -> Unit,
         onVideoEnd: () -> Unit,
     ) {
         val expandedVideo = ExpandedVideoView(activity)
@@ -61,7 +64,6 @@ class PalSdk {
         expandedVideo.show(activity)
         expandedVideo.setLayout(expandedLayout)
         expandedVideo.onVideoEnd = onVideoEnd
-        expandedVideo.onVideoSkip = onSkip
         expandedVideo.play(expandedVideoUrl)
     }
 

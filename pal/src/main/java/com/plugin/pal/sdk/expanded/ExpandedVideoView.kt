@@ -14,12 +14,14 @@ import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
+import android.view.animation.AccelerateInterpolator
 import android.view.animation.LinearInterpolator
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.plugin.pal.R
 import com.plugin.pal.sdk.common.CropVideoView
+import kotlinx.coroutines.delay
 
 
 class ExpandedVideoView: ConstraintLayout, CropVideoView.MediaPlayerListener  {
@@ -56,8 +58,6 @@ class ExpandedVideoView: ConstraintLayout, CropVideoView.MediaPlayerListener  {
     // video attrs
 
     var onVideoEnd : (() -> Unit)? = null
-
-    var onVideoSkip : (() -> Unit)? = null
 
     var expandedVideoUrl: String? = null
 
@@ -100,6 +100,9 @@ class ExpandedVideoView: ConstraintLayout, CropVideoView.MediaPlayerListener  {
         this.videoOverlay = overlay
         if(overlay is VideoOverlayLayout) {
             overlay.setVideoPlayer(cropedVideoView!!)
+            overlay.setClose {
+                exitAnimated()
+            }
         }
         videoContainer!!.addView(videoOverlay)
     }
@@ -136,7 +139,7 @@ class ExpandedVideoView: ConstraintLayout, CropVideoView.MediaPlayerListener  {
                 ObjectAnimator.ofFloat(view, View.TRANSLATION_Y, videoContainer!!.height.toFloat(), 0f),
             )
             duration = 600
-            interpolator = LinearInterpolator()
+            interpolator = AccelerateInterpolator()
             start()
         }
     }
@@ -166,12 +169,14 @@ class ExpandedVideoView: ConstraintLayout, CropVideoView.MediaPlayerListener  {
                         if(onVideoEnd != null) {
                             onVideoEnd()
                         }
+                        cropedVideoView!!.stop()
+                        cropedVideoView!!.close()
                         (view.parent as ViewGroup).removeView(view)
                     }, 500)
                 }
             })
-            duration = 600
-            interpolator = LinearInterpolator()
+            duration = 500
+            interpolator = AccelerateInterpolator()
             start()
         }
     }

@@ -326,6 +326,10 @@ class CropVideoView : TextureView, SurfaceTextureListener {
         }
     }
 
+    fun close() {
+        mMediaPlayer!!.release()
+    }
+
     /**
      * @see android.media.MediaPlayer.setLooping
      */

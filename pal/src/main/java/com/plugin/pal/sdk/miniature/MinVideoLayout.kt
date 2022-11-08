@@ -3,6 +3,7 @@ package com.plugin.pal.sdk.miniature
 import android.app.Activity
 import android.content.Context
 import android.graphics.PixelFormat
+import android.os.Handler
 import android.util.AttributeSet
 import android.view.View.OnClickListener
 import android.view.WindowManager
@@ -50,6 +51,7 @@ class MinVideoLayout :ConstraintLayout{
         //wm.addView(view, mParams)
         activity.addContentView(this, mParams)
         circleView!!.enterAnimated()
+
     }
 
     fun init(
@@ -67,8 +69,6 @@ class MinVideoLayout :ConstraintLayout{
         cropedVideoView!!.setDataSource(minVideoUrl)
         cropedVideoView!!.setLooping(true)
         cropedVideoView!!.setScaleType(CropVideoView.ScaleType.CENTER_CROP);
-
-        circleView!!.visibility = GONE
 
         val onViewTouched = OnClickListener {
             circleView!!.exitAnimated {

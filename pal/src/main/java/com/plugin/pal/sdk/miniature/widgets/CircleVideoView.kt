@@ -102,9 +102,8 @@ class CircleVideoView : FrameLayout {
     }
 
     fun enterAnimated() {
-        this.alpha = 0f
-        visibility = VISIBLE
         val view = this
+        this.alpha = 0f
         this.pivotX = measuredWidth.toFloat() / 2
         this.pivotY = measuredHeight.toFloat() / 2
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
@@ -116,7 +115,7 @@ class CircleVideoView : FrameLayout {
                 ObjectAnimator.ofFloat(view, View.SCALE_X, 0f, 1f),
                 ObjectAnimator.ofFloat(view, View.SCALE_Y, 0f, 1f),
             )
-            startDelay = 500
+            startDelay = 1500
             duration = 500
             interpolator = OvershootInterpolator()
             start()
@@ -139,6 +138,7 @@ class CircleVideoView : FrameLayout {
                 override fun onAnimationEnd(animation: Animator) {
                     super.onAnimationEnd(animation)
                     onAnimationEnd()
+                    // TODO remove view
                 }
             })
             startDelay = 100
