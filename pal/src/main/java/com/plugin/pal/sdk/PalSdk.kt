@@ -9,6 +9,9 @@ import com.plugin.pal.sdk.miniature.MinVideoLayout
 
 class PalSdk {
 
+    /**
+     * Shows a talk video as a popup above an activity
+     */
     fun showTalkVideo(
         activity: Activity,
         minVideoUrl: String,
@@ -43,6 +46,9 @@ class PalSdk {
     // PRIVATES
     // ------------------------------------------------
 
+    /**
+     * Shows a circular min video
+     */
     private fun showMinVideo(
         activity: Activity,
         minVideoUrl: String,
@@ -54,6 +60,9 @@ class PalSdk {
         minVideoView.show(activity)
     }
 
+    /**
+     * Shows an expanded video
+     */
     private fun showExpandedVideo(
         activity: Activity,
         expandedVideoUrl: String,

@@ -3,6 +3,9 @@ package com.plugin.pal.api.models
 import android.content.Context
 import com.plugin.pal.R
 
+/**
+ * Import token from strings or use the provided one
+ */
 data class PalOptions(
     val developmentToken: String,
     val productionToken: String,

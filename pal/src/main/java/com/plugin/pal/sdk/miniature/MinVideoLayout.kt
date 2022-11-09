@@ -12,6 +12,7 @@ import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.widget.LinearLayout
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.fragment.app.Fragment
 import com.plugin.pal.R
 import com.plugin.pal.sdk.common.CropVideoView
 import com.plugin.pal.sdk.miniature.widgets.CircleVideoView
