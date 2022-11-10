@@ -38,12 +38,8 @@ class MainActivity : AppCompatActivity() {
 
         // test plugin
         PalPlugin.setup(this, developmentToken)
-        GlobalScope.launch {
-            withContext(Dispatchers.Main) {
-                PalPlugin.instance.initialize()
-                PalPlugin.instance.logCurrentScreen(this@MainActivity, "/")
-            }
-        }
+
+        PalPlugin.instance.logCurrentScreen(this@MainActivity, "/")
     }
 
     private fun showVideo() {

@@ -21,5 +21,5 @@ interface EventHttpApi {
     suspend fun logTriggeredVideoEvent(
         @Path("id") triggeredVideoID: String,
         @Body event: VideoTriggerEvent
-    ): Response<PalVideoTrigger>
+    ): Response<Unit>
 }

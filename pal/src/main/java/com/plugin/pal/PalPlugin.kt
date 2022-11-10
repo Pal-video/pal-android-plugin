@@ -14,12 +14,11 @@ import com.plugin.pal.api.models.PalOptions
 import com.plugin.pal.api.models.PalVideoTrigger
 import com.plugin.pal.api.storage.LocalSessionStorageApi
 import com.plugin.pal.sdk.PalSdk
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 
 const val PAL_SERVER_URL = "https://back.pal.video"
 
+@OptIn(DelicateCoroutinesApi::class)
 class PalPlugin private constructor() {
 
     private lateinit var sessionApi: SessionApi
@@ -32,7 +31,7 @@ class PalPlugin private constructor() {
 
     private var triggeredVideo: PalVideoTrigger? = null
 
-    private val backgroundScope = CoroutineScope(Dispatchers.IO)
+    private val eventNotifierScope = CoroutineScope(Dispatchers.Default)
 
     companion object  {
 
@@ -75,29 +74,33 @@ class PalPlugin private constructor() {
         }
     }
 
-    suspend fun logCurrentScreen(fragment: Fragment, path: String) {
+    fun logCurrentScreen(fragment: Fragment, path: String) {
         return logCurrentScreen(fragment.activity as Activity, path)
     }
 
-    suspend fun logCurrentScreen(activity: Activity, path: String) {
+    fun logCurrentScreen(activity: Activity, path: String) {
         try {
-            checkHasInit()
             Log.d(TAG, "...logCurrentScreen on path: $path")
-            triggeredVideo = eventApi.logCurrentScreen(sessionApi.getSession()!!, path).body()
-                ?: return
-            Log.d(TAG, "A video has triggered -> ${triggeredVideo!!.videoId}")
-            when (triggeredVideo!!.flowType) {
-                PalVideoTrigger.VideoFlowType.TALK -> palSdk.showTalkVideo(
-                    activity,
-                    triggeredVideo!!.videoThumbUrl,
-                    triggeredVideo!!.videoUrl,
-                    triggeredVideo!!.videoSpeakerName,
-                    triggeredVideo!!.videoSpeakerRole,
-                    { onSkip() },
-                    { onExpand() },
-                    { onVideoEnd() },
-                )
-                PalVideoTrigger.VideoFlowType.SURVEY -> Log.d(TAG, "Not implemented yet")
+            GlobalScope.launch(Dispatchers.Main) {
+                sessionApi.initSession()
+                checkHasInit()
+                triggeredVideo = eventApi.logCurrentScreen(sessionApi.getSession()!!, path).body()
+                    ?: return@launch
+                Log.d(TAG, "A video has triggered -> ${triggeredVideo!!.videoId}")
+                Log.d(TAG, "eventLog -> ${triggeredVideo!!.eventLogId}")
+                when (triggeredVideo!!.flowType) {
+                    PalVideoTrigger.VideoFlowType.TALK -> palSdk.showTalkVideo(
+                        activity,
+                        triggeredVideo!!.videoThumbUrl,
+                        triggeredVideo!!.videoUrl,
+                        triggeredVideo!!.videoSpeakerName,
+                        triggeredVideo!!.videoSpeakerRole,
+                        { onSkip() },
+                        { onExpand() },
+                        { onVideoEnd() },
+                    )
+                    PalVideoTrigger.VideoFlowType.SURVEY -> Log.d(TAG, "Not implemented yet")
+                }
             }
         } catch (err: java.lang.Exception) {
             Log.e(TAG, "LogCurrentScreen failed ", err)
@@ -118,9 +121,9 @@ class PalPlugin private constructor() {
 
     private fun onSkip() {
         try {
-            backgroundScope.launch {
-                triggeredVideo = null
+            eventNotifierScope.launch {
                 eventApi.logVideoSkipped(sessionApi.getSession()!!, triggeredVideo!!)
+                triggeredVideo = null
             }
         } catch (error: Exception) {
             Log.e(TAG, "Error while saving onSkip", error)
@@ -129,7 +132,7 @@ class PalPlugin private constructor() {
 
     private fun onExpand() {
         try {
-            backgroundScope.launch {
+            eventNotifierScope.launch {
                 eventApi.logVideoExpanded(sessionApi.getSession()!!, triggeredVideo!!)
             }
         } catch (error: Exception) {
@@ -139,7 +142,7 @@ class PalPlugin private constructor() {
 
     private fun onVideoEnd() {
         try {
-            backgroundScope.launch {
+            eventNotifierScope.launch {
                 eventApi.logVideoEnded(sessionApi.getSession()!!, triggeredVideo!!)
             }
         } catch (error: Exception) {
