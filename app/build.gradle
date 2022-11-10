@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace 'com.plugin.pal'
+    namespace 'video.pal'
     compileSdk 33
 
     defaultConfig {
-        applicationId "com.plugin.pal"
+        applicationId "video.pal"
         minSdk 21
         targetSdk 33
         versionCode 1

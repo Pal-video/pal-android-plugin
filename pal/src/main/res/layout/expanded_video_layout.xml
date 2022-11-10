@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.plugin.pal.sdk.expanded.widgets.RoundedVideoContainer
+    <video.pal.sdk.expanded.widgets.RoundedVideoContainer
         android:id="@+id/video_container"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -15,7 +15,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <com.plugin.pal.sdk.common.CropVideoView
+        <video.pal.sdk.common.CropVideoView
             android:id="@+id/crop_video_texture"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -24,6 +24,6 @@
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
-    </com.plugin.pal.sdk.expanded.widgets.RoundedVideoContainer>
+    </video.pal.sdk.expanded.widgets.RoundedVideoContainer>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

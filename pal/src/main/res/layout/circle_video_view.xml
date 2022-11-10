@@ -6,7 +6,7 @@
     android:background="@drawable/round"
     android:layout_height="match_parent">
 
-    <com.plugin.pal.sdk.miniature.widgets.CircleVideoView
+    <video.pal.sdk.miniature.widgets.CircleVideoView
         android:id="@+id/min_videoView"
         android:layout_width="150dp"
         android:layout_height="150dp"
