@@ -50,7 +50,7 @@ afterEvaluate {
                 from components.release
                 groupId 'video.pal'
                 artifactId 'pal.video'
-                version = android.defaultConfig.versionName
+                version = '0.0.0'
             }
         }
         repositories {
