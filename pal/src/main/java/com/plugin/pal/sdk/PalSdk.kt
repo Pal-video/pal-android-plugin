@@ -1,7 +1,6 @@
 package com.plugin.pal.sdk
 
 import android.app.Activity
-import android.os.Handler
 import android.view.View
 import com.plugin.pal.sdk.expanded.ExpandedVideoView
 import com.plugin.pal.sdk.expanded.TalkLayout
@@ -73,7 +72,7 @@ class PalSdk {
 
         expandedVideo.show(activity)
         expandedVideo.setLayout(expandedLayout)
-        expandedVideo.onVideoEnd = onVideoEnd
+        expandedVideo.onVideoEndListener = onVideoEnd
         expandedVideo.play(expandedVideoUrl)
     }
 

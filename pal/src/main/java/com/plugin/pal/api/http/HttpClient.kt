@@ -1,6 +1,7 @@
 package com.plugin.pal.api.http
 
 import android.util.Log
+import com.google.gson.GsonBuilder
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.Response
@@ -12,15 +13,16 @@ object HttpClient {
 
     fun getInstance(baseUrl: String, apiToken: String): Retrofit {
         val httpClient: OkHttpClient.Builder = OkHttpClient.Builder()
-        httpClient.addInterceptor(AuthInterceptor(apiToken))
+            .addInterceptor(AuthInterceptor(apiToken))
+        val gson = GsonBuilder()
+            .setDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'")
+            .create()
 
         return Retrofit.Builder().baseUrl(baseUrl)
-            .addConverterFactory(GsonConverterFactory.create())
+            .addConverterFactory(GsonConverterFactory.create(gson))
             .client(httpClient.build())
             .build()
-
     }
-
 
     class AuthInterceptor(private val token: String) : Interceptor {
 
@@ -28,11 +30,8 @@ object HttpClient {
             val requestBuilder = chain.request()
                 .newBuilder()
                 .addHeader("Authorization", "Bearer $token")
-            Log.d("HttpClient", " ==> ${chain.request().url()}")
             return chain.proceed(requestBuilder.build())
         }
 
     }
-
-
 }

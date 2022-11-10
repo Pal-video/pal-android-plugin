@@ -1,5 +1,6 @@
 package com.plugin.pal.api
 
+import android.util.Log
 import com.plugin.pal.api.exceptions.EventApiException
 import com.plugin.pal.api.http.EventHttpApi
 import com.plugin.pal.api.http.HttpClient
@@ -33,7 +34,9 @@ class EventApi(
         val event = VideoTriggerEvent(
             VideoTriggerEvent.VideoTriggerEvents.videoSkip,
             Date(),
-            session.uid)
+            session.uid,
+            emptyMap()
+        )
         return withContext(dispatcher) {
             eventHttpApi.logTriggeredVideoEvent(triggeredVideo.eventLogId, event)
         }
@@ -46,7 +49,9 @@ class EventApi(
         val event = VideoTriggerEvent(
             VideoTriggerEvent.VideoTriggerEvents.minVideoOpen,
             Date(),
-            session.uid)
+            session.uid,
+            emptyMap()
+        )
         return withContext(dispatcher){
             eventHttpApi.logTriggeredVideoEvent(triggeredVideo.eventLogId, event)
         }
@@ -59,7 +64,9 @@ class EventApi(
         val event = VideoTriggerEvent(
             VideoTriggerEvent.VideoTriggerEvents.videoViewed,
             Date(),
-            session.uid)
+            session.uid,
+            emptyMap()
+        )
         return withContext(dispatcher) {
             eventHttpApi.logTriggeredVideoEvent(triggeredVideo.eventLogId, event)
         }

@@ -107,6 +107,10 @@ class PalPlugin private constructor() {
         }
     }
 
+    fun clearSession() {
+        sessionApi.clear()
+    }
+
     fun hasInit(): Boolean {
         return sessionApi.hasSession()
     }
