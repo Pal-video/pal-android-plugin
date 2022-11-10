@@ -2,6 +2,8 @@ plugins {
     id 'com.android.library'
     id 'org.jetbrains.kotlin.android'
     id 'maven-publish'
+//    id("java-gradle-plugin")
+//    id("com.gradle.plugin-publish") version "1.0.0-rc-1"
 }
 
 android {
@@ -38,6 +40,7 @@ android {
             withJavadocJar()
         }
     }
+
 }
 
 afterEvaluate {
@@ -50,8 +53,17 @@ afterEvaluate {
                 version = android.defaultConfig.versionName
             }
         }
+        repositories {
+            maven {
+                //url "https://github.com/Pal-video/pal-android-plugin"
+                url "$buildDir/repo"
+            }
+        }
     }
 }
+
+
+
 
 dependencies {
     implementation 'androidx.core:core-ktx:1.9.0'

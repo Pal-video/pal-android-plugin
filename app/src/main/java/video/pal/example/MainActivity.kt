@@ -1,4 +1,4 @@
-package video.pal
+package video.pal.example
 
 import android.os.Bundle
 import android.util.Log
@@ -7,7 +7,6 @@ import androidx.appcompat.app.AppCompatActivity
 import video.pal.sdk.PalSdk
 import kotlinx.coroutines.*
 import video.pal.PalPlugin
-import video.pal.R
 
 class MainActivity : AppCompatActivity() {
 
