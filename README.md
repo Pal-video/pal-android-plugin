@@ -26,7 +26,7 @@ allprojects {
 	}
 ```
 
-**Step 3.** Add the dependency
+**Step 3.** Setup the plugin with Api token
 
 Setup the plugin using the develop or production apiToken (available in your web admin dashboard)
 ```kotlin
@@ -34,6 +34,7 @@ PalPlugin.setup(this, token)
 ```
 
 **Step 4.** push your screen events to our backend 
+
 We simply needs a context.
 Second argument is a route name. (We use this to have a standard accross all frameworks including web)
 ```kotlin
