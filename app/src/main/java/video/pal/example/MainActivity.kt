@@ -34,7 +34,7 @@ class MainActivity : AppCompatActivity() {
 
         // test plugin
         PalPlugin.setup(this, productionToken)
-        PalPlugin.instance.clearSession()
+        //PalPlugin.instance.clearSession()
 
         PalPlugin.instance.logCurrentScreen(this@MainActivity, "/")
     }

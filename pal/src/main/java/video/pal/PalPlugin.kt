@@ -2,9 +2,10 @@ package video.pal
 
 import android.app.Activity
 import android.content.Context
+import android.content.ContextWrapper
 import android.util.Log
+import android.view.View
 import androidx.fragment.app.Fragment
-
 import kotlinx.coroutines.*
 import video.pal.api.EventApi
 import video.pal.api.SessionApi
@@ -16,6 +17,7 @@ import video.pal.api.models.PalOptions
 import video.pal.api.models.PalVideoTrigger
 import video.pal.api.storage.LocalSessionStorageApi
 import video.pal.sdk.PalSdk
+
 
 const val PAL_SERVER_URL = "https://back.pal.video"
 
@@ -75,8 +77,12 @@ class PalPlugin private constructor() {
         }
     }
 
-    fun logCurrentScreen(fragment: Fragment, path: String) {
-        return logCurrentScreen(fragment.activity as Activity, path)
+    fun logCurrentScreen(context: Context, path: String) {
+        if(context is Activity) {
+            return logCurrentScreen(context, path)
+        }
+        val activity = context.getActivity() ?: return
+        return logCurrentScreen(activity, path)
     }
 
     fun logCurrentScreen(activity: Activity, path: String) {
@@ -109,7 +115,11 @@ class PalPlugin private constructor() {
     }
 
     fun clearSession() {
-        sessionApi.clear()
+        try {
+            sessionApi.clear()
+        } catch (err: java.lang.Exception) {
+            Log.e(TAG, "LogCurrentScreen failed ", err)
+        }
     }
 
     fun hasInit(): Boolean {
@@ -153,6 +163,20 @@ class PalPlugin private constructor() {
         } catch (error: Exception) {
             Log.e(TAG, "Error while saving onVideoEnd", error)
         }
+    }
+
+    tailrec fun Context?.getActivity(): Activity? = this as? Activity
+        ?: (this as? ContextWrapper)?.baseContext?.getActivity()
+
+    private fun getActivity(view: View): Activity? {
+        var context = view.context
+        while (context is ContextWrapper) {
+            if (context is Activity) {
+                return context
+            }
+            context = context.baseContext
+        }
+        return null
     }
 
 }
