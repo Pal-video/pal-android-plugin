@@ -94,7 +94,6 @@ class PalPlugin private constructor() {
                 triggeredVideo = eventApi.logCurrentScreen(sessionApi.getSession()!!, path).body()
                     ?: return@launch
                 Log.d(TAG, "A video has triggered -> ${triggeredVideo!!.videoId}")
-                Log.d(TAG, "eventLog -> ${triggeredVideo!!.eventLogId}")
                 when (triggeredVideo!!.flowType) {
                     PalVideoTrigger.VideoFlowType.TALK -> palSdk.showTalkVideo(
                         activity,
