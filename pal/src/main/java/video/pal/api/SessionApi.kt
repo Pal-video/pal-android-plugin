@@ -7,6 +7,7 @@ import video.pal.api.models.SessionDtoReq
 import video.pal.api.storage.SessionStorageApi
 import kotlinx.coroutines.*
 
+
 class SessionApi(
     private val sessionHttpApi: SessionHttpApi,
     private val sessionStorageApi: SessionStorageApi,
@@ -14,6 +15,8 @@ class SessionApi(
 ) {
 
     companion object {
+        const val platformType = "KOTLIN"
+
         val TAG = SessionApi::javaClass.name
     }
 
@@ -27,7 +30,7 @@ class SessionApi(
             return
         }
         return withContext(dispatcher) {
-            val sessionResult =  sessionHttpApi.create(SessionDtoReq("android", "FLUTTER")) // FIXME change to ANDROID
+            val sessionResult =  sessionHttpApi.create(SessionDtoReq("android", platformType))
             session = sessionResult.body()
             Log.d(TAG, "session created with uid ${session?.uid}")
             sessionStorageApi.save(session)
