@@ -108,7 +108,7 @@ class PalPlugin private constructor() {
                     PalVideoTrigger.VideoFlowType.SURVEY -> Log.d(TAG, "Not implemented yet")
                 }
             }
-        } catch (err: java.lang.Exception) {
+        } catch (err: Exception) {
             Log.e(TAG, "LogCurrentScreen failed ", err)
         }
     }
@@ -134,34 +134,28 @@ class PalPlugin private constructor() {
     }
 
     private fun onSkip() {
-        try {
-            eventNotifierScope.launch {
-                eventApi.logVideoSkipped(sessionApi.getSession()!!, triggeredVideo!!)
-                triggeredVideo = null
-            }
-        } catch (error: Exception) {
-            Log.e(TAG, "Error while saving onSkip", error)
+        eventNotifierScope.launch(exceptionHandler) {
+            eventApi.logVideoSkipped(sessionApi.getSession()!!, triggeredVideo!!)
+            triggeredVideo = null
         }
     }
 
     private fun onExpand() {
-        try {
-            eventNotifierScope.launch {
-                eventApi.logVideoExpanded(sessionApi.getSession()!!, triggeredVideo!!)
-            }
-        } catch (error: Exception) {
-            Log.e(TAG, "Error while saving onExpand", error)
+        eventNotifierScope.launch(exceptionHandler) {
+            eventApi.logVideoExpanded(sessionApi.getSession()!!, triggeredVideo!!)
         }
     }
 
     private fun onVideoEnd() {
-        try {
-            eventNotifierScope.launch {
-                eventApi.logVideoEnded(sessionApi.getSession()!!, triggeredVideo!!)
-            }
-        } catch (error: Exception) {
-            Log.e(TAG, "Error while saving onVideoEnd", error)
+        if(triggeredVideo == null)
+            return;
+        eventNotifierScope.launch(exceptionHandler) {
+            eventApi.logVideoEnded(sessionApi.getSession()!!, triggeredVideo!!)
         }
+    }
+
+    private val exceptionHandler = CoroutineExceptionHandler { _, exception ->
+        Log.e(TAG, "Error sending a log event", exception)
     }
 
     tailrec fun Context?.getActivity(): Activity? = this as? Activity

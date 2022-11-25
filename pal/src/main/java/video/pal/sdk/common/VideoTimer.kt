@@ -49,13 +49,15 @@ class VideoTimer(
         running = true
         val task = object: Runnable {
             override fun run() {
-                if(running) {
-                    val result = VideoTime(
-                        mediaPlayer.currentPosition,
-                        mediaPlayer.duration)
-                    timeListenr!!(result)
-                    taskHandler.postDelayed(this, 1000)
-                }
+                try {
+                    if(running) {
+                        val result = VideoTime(
+                            mediaPlayer.currentPosition,
+                            mediaPlayer.duration)
+                        timeListenr!!(result)
+                        taskHandler.postDelayed(this, 1000)
+                    }
+                } catch (_: Exception) {}
             }
         }
         taskHandler.post(task)

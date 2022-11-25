@@ -44,3 +44,20 @@ PalPlugin.instance.logCurrentScreen(context, "/")
 You are done 👏
 
 
+--------------
+
+
+## FAQ
+
+- I have this error when I build : 
+
+> "Duplicate class androidx.lifecycle.ViewModelLazy found in modules jetified-lifecycle-viewmodel-ktx-2.3.1-runtime (androidx.lifecycle:lifecycle-viewmodel-ktx:2.3.1) and lifecycle-viewmodel-2.5.1-runtime (androidx.lifecycle:lifecycle-viewmodel:2.5.1)"
+
+**Solution** 
+Add this dependency in your build gradle
+```kotlin
+implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1'
+```
+
+
+

@@ -33,8 +33,8 @@ class MainActivity : AppCompatActivity() {
 //        }, 100)
 
         // test plugin
-        PalPlugin.setup(this, developmentToken)
-        //PalPlugin.instance.clearSession()
+        PalPlugin.setup(this, productionToken)
+        PalPlugin.instance.clearSession()
 
         PalPlugin.instance.logCurrentScreen(this@MainActivity, "/")
     }
@@ -42,16 +42,16 @@ class MainActivity : AppCompatActivity() {
     private fun showVideo() {
 //        PalPlugin.instance.clearSession()
 //        PalPlugin.instance.logCurrentScreen(this@MainActivity, "/")
-        palSdk.showTalkVideo(
-            this,
-            videoUrl_LQ,
-            videoUrl_HQ,
-            "David",
-            "CEO | Pal",
-            {  Log.d("MainActivity", "onSkip") },
-            {  Log.d("MainActivity", "onExpand") },
-            {  Log.d("MainActivity", "onVideoEnd") },
-        )
+//        palSdk.showTalkVideo(
+//            this,
+//            videoUrl_LQ,
+//            videoUrl_HQ,
+//            "David",
+//            "CEO | Pal",
+//            {  Log.d("MainActivity", "onSkip") },
+//            {  Log.d("MainActivity", "onExpand") },
+//            {  Log.d("MainActivity", "onVideoEnd") },
+//        )
     }
 
 }
