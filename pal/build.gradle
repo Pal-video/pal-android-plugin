@@ -50,7 +50,7 @@ afterEvaluate {
                 from components.release
                 groupId 'video.pal'
                 artifactId 'pal.video'
-                version = '0.0.0'
+                version = '1.0.0'
             }
         }
         repositories {
@@ -62,27 +62,24 @@ afterEvaluate {
     }
 }
 
-
-
-
 dependencies {
-    implementation 'androidx.core:core-ktx:1.9.0'
-    implementation 'androidx.appcompat:appcompat:1.5.1'
-    implementation 'com.google.android.material:material:1.7.0'
+    api 'androidx.core:core-ktx:1.9.0'
+    api 'androidx.appcompat:appcompat:1.5.1'
+    api 'com.google.android.material:material:1.7.0'
     testImplementation 'junit:junit:4.13.2'
-//    testImplementation "org.junit.jupiter:junit-jupiter:5.8.2"
-    // https://mvnrepository.com/artifact/org.mockito.kotlin/mockito-kotlin
+    //  testImplementation "org.junit.jupiter:junit-jupiter:5.8.2"
+    // https://mvnrepository.com/artifact/com.squareup.retrofit2/retrofit
+    api 'com.squareup.retrofit2:retrofit:2.9.0'
+    // https://mvnrepository.com/artifact/com.squareup.retrofit2/converter-gson
+    api 'com.squareup.retrofit2:converter-gson:2.9.0'
+    // coroutine
+    api 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4'
+    api 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4'
+
+    // Tests
     testImplementation 'org.mockito.kotlin:mockito-kotlin:4.0.0'
     androidTestImplementation 'androidx.test.ext:junit:1.1.4'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.0'
-
-    // https://mvnrepository.com/artifact/com.squareup.retrofit2/retrofit
-    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
-    // https://mvnrepository.com/artifact/com.squareup.retrofit2/converter-gson
-    implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
-    // coroutine
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4'
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4'
     testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4'
 
 

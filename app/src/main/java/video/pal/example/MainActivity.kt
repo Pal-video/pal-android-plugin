@@ -33,13 +33,15 @@ class MainActivity : AppCompatActivity() {
 //        }, 100)
 
         // test plugin
-        PalPlugin.setup(this, productionToken)
+        PalPlugin.setup(this, developmentToken)
         //PalPlugin.instance.clearSession()
 
         PalPlugin.instance.logCurrentScreen(this@MainActivity, "/")
     }
 
     private fun showVideo() {
+//        PalPlugin.instance.clearSession()
+//        PalPlugin.instance.logCurrentScreen(this@MainActivity, "/")
         palSdk.showTalkVideo(
             this,
             videoUrl_LQ,
